@@ -84,7 +84,6 @@ public class AntiAircraftGun
         int shiftY = 30;
 
         //Башня
-
         g2d.fillRect((int)startPosX - 3 + shiftX, (int)startPosY - 10 + shiftY, 60, 20);
         //Корпус
 
