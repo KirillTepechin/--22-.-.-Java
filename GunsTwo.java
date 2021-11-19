@@ -14,17 +14,12 @@ public class GunsTwo implements GunsInterface{
 
         switch (guns){
             case TWO :
-
                 drawTwo(g,color,x,y);
                 break;
-
             case FOUR :
-
                 drawFour(g,color,x,y);
                 break;
-
             case SIX:
-
                 drawSix(g,color,x,y);
                 break;
         }
