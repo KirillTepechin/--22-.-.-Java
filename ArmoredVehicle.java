@@ -18,8 +18,6 @@ public class ArmoredVehicle extends Vehicle {
         this.carWeight = carWidth;
         this.carHeight = carHeight;
     }
-
-
     public void drawTransport(Graphics g) {
         Graphics2D g2d = (Graphics2D)g;
 
@@ -30,10 +28,8 @@ public class ArmoredVehicle extends Vehicle {
         int shiftY = 30;
 
         //Башня
-
         g2d.fillRect((int)startPosX - 3 + shiftX, (int)startPosY - 10 + shiftY, 60, 20);
         //Корпус
-
         g2d.fillRect((int)startPosX - 45 + shiftX, (int)startPosY + 5 + shiftY, 140 , 15);
         //Гусеницы
         g2d.drawOval((int)startPosX - 51 + shiftX, (int)startPosY + 18 + shiftY, 25, 24);
