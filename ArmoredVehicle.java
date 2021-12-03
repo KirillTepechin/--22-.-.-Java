@@ -18,8 +18,6 @@ public class ArmoredVehicle extends Vehicle {
         this.carWeight = carWidth;
         this.carHeight = carHeight;
     }
-
-
     public void drawTransport(Graphics g) {
         Graphics2D g2d = (Graphics2D)g;
 
