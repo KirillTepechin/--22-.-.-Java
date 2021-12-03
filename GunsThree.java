@@ -4,9 +4,9 @@ public class GunsThree implements GunsInterface{
     private GunsCount guns;
     public void setAmount(int amount) {
         switch (amount) {
-            case 4 : guns = GunsCount.FOUR;break;
-            case 6 : guns = GunsCount.SIX;break;
-            default : guns = GunsCount.TWO;break;
+            case 4 : guns = GunsCount.FOUR; break;
+            case 6 : guns = GunsCount.SIX; break;
+            default : guns = GunsCount.TWO; break;
         }
     }
     public void drawGuns(Graphics2D g, Color color, float x, float y) {
@@ -17,11 +17,8 @@ public class GunsThree implements GunsInterface{
                 break;
             case FOUR:
                 drawFour(g,color,x,y);
-
                 break;
-
             case SIX :
-
                 drawSix(g,color,x,y);
                 break;
         }
