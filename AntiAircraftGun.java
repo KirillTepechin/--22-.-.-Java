@@ -28,6 +28,7 @@ public class AntiAircraftGun extends ArmoredVehicle
     {
         super.drawTransport(g);
         Graphics2D g2d = (Graphics2D)g;
+        
         int shiftX = 30;
         int shiftY = 30;
         //Пушка
