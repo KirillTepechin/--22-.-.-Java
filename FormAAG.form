@@ -30,7 +30,7 @@
           </vspacer>
           <component id="565ff" class="javax.swing.JButton" binding="buttonRight">
             <constraints>
-              <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="RIGHT"/>
@@ -51,7 +51,7 @@
               <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <hideActionText value="true"/>
+              <hideActionText value="false"/>
               <text value="UP"/>
             </properties>
           </component>
