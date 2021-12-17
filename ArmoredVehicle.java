@@ -21,7 +21,7 @@ public class ArmoredVehicle extends Vehicle {
 
 
     public void drawTransport(Graphics g) {
-        Graphics2D g2d =(Graphics2D)g;
+        Graphics2D g2d = (Graphics2D)g;
 
         g2d.setColor(mainColor);
         g2d.setStroke(new BasicStroke(3));
