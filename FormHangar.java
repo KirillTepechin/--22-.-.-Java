@@ -27,39 +27,16 @@ public class FormHangar {
         hangarList = new DefaultListModel<>();
         listBoxHangars.setModel(hangarList);
         hangarCollection = drawPanel.getHangarCollection();
-        buttonSetAAG.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Color dialog = JColorChooser.showDialog(null, "Основной цвет", Color.GREEN);
-                if (dialog != null) {
-                    Color dialogDop = JColorChooser.showDialog(null, "Дополнительный цвет", Color.BLACK);
-                    if (dialogDop != null) {
-                        Transport AAG = new AntiAircraftGun(100, 1000, dialog, dialogDop, true, true);
-                        Hangar hangar = hangarCollection.getValue(listBoxHangars.getSelectedValue());
-                        if (hangar.add(hangar, AAG) > -1) {
-                            drawPanel.repaint();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Ангар переполнен!");
-                        }
-                    }
-                }
-            }
-        });
+
         buttonSetArmoredVehicle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (listBoxHangars.getSelectedIndex() > -1) {
-                    Color dialog = JColorChooser.showDialog(null, "Основной цвет", Color.GREEN);
-                    if (dialog != null) {
-                        Transport armoredVehicle = new ArmoredVehicle(100, 1000, dialog);
-                        Hangar hangar = hangarCollection.getValue(listBoxHangars.getSelectedValue());
-                        if (hangar.add(hangar, armoredVehicle) > -1) {
-                            drawPanel.repaint();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Ангар переполнен!");
-                        }
-                    }
-                }
+                JFrame frame = new JFrame();
+                frame.setSize(1000, 500);
+                FormAAGConfig formAAGConfig=new FormAAGConfig(FormHangar.this);
+                frame.add(formAAGConfig.getMainPanel());
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
             }
         });
         buttonTake.addActionListener(new ActionListener() {
@@ -148,4 +125,12 @@ public class FormHangar {
         return mainPanel;
     }
 
+    public void setArmoredVehicle(Transport armoredVehicle){
+        Hangar hangar = hangarCollection.getValue(listBoxHangars.getSelectedValue());
+        if (hangar.add(hangar, armoredVehicle) > -1) {
+            drawPanel.repaint();
+        } else {
+            JOptionPane.showMessageDialog(null, "Ангар переполнен!");
+        }
+    }
 }

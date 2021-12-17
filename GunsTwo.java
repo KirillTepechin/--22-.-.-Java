@@ -11,7 +11,6 @@ public class GunsTwo implements GunsInterface{
         }
     }
     public void drawGuns(Graphics2D g, Color color, float x, float y) {
-
         switch (guns){
             case TWO :
                 drawTwo(g,color,x,y);
@@ -23,7 +22,6 @@ public class GunsTwo implements GunsInterface{
                 drawSix(g,color,x,y);
                 break;
         }
-
     }
     public void drawTwo(Graphics2D g, Color color, float x, float y){
         int shiftX = 30;
