@@ -14,21 +14,13 @@ public class AntiAircraftGun extends ArmoredVehicle
         this.dopColor = dopColor;
         this.radiolocation = radiolocation;
         this.gun = gun;
-        int type = 1+(int)(Math.random()*3);
-        switch (type){
-            case 1: guns=new GunsOne(); break;
-            case 2: guns=new GunsTwo(); break;
-            case 3: guns=new GunsThree(); break;
-        }
-
         int rnd= 1 + (int) (Math.random() * 3);
-        guns.setAmount(rnd*2);
+        //guns.setAmount(rnd*2);
     }
     public void drawTransport(Graphics g)
     {
         super.drawTransport(g);
         Graphics2D g2d = (Graphics2D)g;
-        
         int shiftX = 30;
         int shiftY = 30;
         //Пушка
@@ -86,4 +78,9 @@ public class AntiAircraftGun extends ArmoredVehicle
     public void setDopColor(Color dopColor) {
         this.dopColor = dopColor;
     }
+
+    public void setGuns(GunsInterface guns) {
+        this.guns = guns;
+    }
+
 }
