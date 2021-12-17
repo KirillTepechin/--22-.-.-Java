@@ -3,11 +3,22 @@ import java.awt.*;
 public class ArmoredVehicle extends Vehicle {
     protected int carWeight = 90;
     protected int carHeight = 50;
+    protected char separator = ';';
     public ArmoredVehicle(int maxSpeed, float weight, Color mainColor)
     {
         this.maxSpeed = maxSpeed;
         this.weight = weight;
         this.mainColor = mainColor;
+    }
+    public ArmoredVehicle(String info)
+    {
+        String[] strs = info.split(String.valueOf(separator));
+        if (strs.length == 3)
+        {
+            maxSpeed = Integer.parseInt(strs[0]);
+            weight = Float.parseFloat(strs[1]);
+            mainColor = Color.decode(strs[2]);
+        }
     }
     protected ArmoredVehicle(int maxSpeed, float weight, Color mainColor, int carWidth, int
             carHeight)
@@ -21,7 +32,7 @@ public class ArmoredVehicle extends Vehicle {
 
 
     public void drawTransport(Graphics g) {
-        Graphics2D g2d = (Graphics2D)g;
+        Graphics2D g2d =(Graphics2D)g;
 
         g2d.setColor(mainColor);
         g2d.setStroke(new BasicStroke(3));
@@ -89,4 +100,9 @@ public class ArmoredVehicle extends Vehicle {
                 break;
         }
     }
+    @Override
+    public String toString() {
+        return String.valueOf(maxSpeed) + separator + weight + separator + mainColor.getRGB();
+    }
+
 }

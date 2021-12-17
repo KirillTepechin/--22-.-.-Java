@@ -40,6 +40,7 @@ public abstract class Vehicle implements Transport {
     }
     public abstract void drawTransport(Graphics g);
     public abstract void moveTransport(Direction direction);
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();

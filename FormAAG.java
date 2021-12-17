@@ -15,7 +15,7 @@ public class FormAAG{
     private DrawAAG drawAAG;
 
     private Transport armoredVehicle;
-    
+
     public void setArmoredVehicle(Transport armoredVehicle){
         this.armoredVehicle = armoredVehicle;
         drawAAG.setArmoredVehicle(armoredVehicle);

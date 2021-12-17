@@ -50,4 +50,8 @@ public class GunsThree implements GunsInterface{
         g.drawLine((int)x+shiftX-2+5+10,(int)y+shiftY+10+5,(int)x+shiftX-2+5+10+30,(int)y+shiftY+10-20+5);
         g.drawLine((int)x+shiftX-2+5+10,(int)y+shiftY+10+10,(int)x+shiftX-2+5+10+30,(int)y+shiftY+10-20+10);
     }
+    @Override
+    public String toString() {
+        return GunsThree.class.getSimpleName() + '.' + (guns.ordinal()+1)*2;
+    }
 }

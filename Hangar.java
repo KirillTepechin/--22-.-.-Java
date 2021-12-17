@@ -102,5 +102,7 @@ public class Hangar<T extends Transport,G extends GunsInterface > {
         }
         return null;
     }
-
+    public void clearHangar(){
+        places.clear();
+    }
 }
