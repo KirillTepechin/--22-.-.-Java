@@ -14,8 +14,6 @@ public class AntiAircraftGun extends ArmoredVehicle
         this.dopColor = dopColor;
         this.radiolocation = radiolocation;
         this.gun = gun;
-        int rnd= 1 + (int) (Math.random() * 3);
-        //guns.setAmount(rnd*2);
     }
     public void drawTransport(Graphics g)
     {
