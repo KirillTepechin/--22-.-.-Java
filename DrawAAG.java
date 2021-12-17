@@ -3,7 +3,6 @@ import java.awt.*;
 
 public class DrawAAG extends JPanel {
 
-
     private Transport armoredVehicle;
     @Override
     protected void paintComponent(Graphics g) {
@@ -18,5 +17,6 @@ public class DrawAAG extends JPanel {
     public void setArmoredVehicle(Transport armoredVehicle) {
         this.armoredVehicle=armoredVehicle;
     }
+
 }
 

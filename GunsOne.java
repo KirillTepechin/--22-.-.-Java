@@ -59,4 +59,8 @@ public class GunsOne implements GunsInterface {
         g.drawLine((int)x + 12 + 2 + 10 +10 + shiftX, (int)y - 5 + 2 +15 + shiftY, (int)x + 37+ 2 + 10+10  + shiftX, (int)y - 15 + 2+15 + shiftY);
         g.drawLine((int)x + 15 + 10+10+ shiftX, (int)y+15 + shiftY, (int)x + 70+ 10+10 + shiftX, (int)y - 25+15 + shiftY);
     }
+    @Override
+    public String toString() {
+        return GunsOne.class.getSimpleName() + '.' + (guns.ordinal()+1)*2;
+    }
 }

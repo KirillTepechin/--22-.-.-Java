@@ -2,10 +2,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
 import java.awt.*;
-import java.awt.event.*;;
+import java.awt.event.*;
+import java.io.*;
+;
 
 
-public class FormAAGConfig{
+public class FormAAGConfig {
     private JPanel mainPanel;
     private JSpinner spinnerSpeed;
     private JSpinner spinnerWeight;
@@ -37,7 +39,7 @@ public class FormAAGConfig{
     private final ButtonGroup buttonGroup=new ButtonGroup();
     private Color color;
     private Vehicle armoredVehicle = null;
-    private  Vehicle buffer = null;
+    private Vehicle buffer = null;
     private GunsInterface realization;
     public FormAAGConfig(FormHangar formHangar){
         init();
@@ -68,7 +70,6 @@ public class FormAAGConfig{
         MouseListener typeListenerDrop=new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-
                 if (checkLocation(e, drawPanel)) {
                     try {
                         armoredVehicle= (Vehicle) buffer.clone();
@@ -78,6 +79,10 @@ public class FormAAGConfig{
                     armoredVehicle.setPosition(130, 130, drawPanel.getWidth(), drawPanel.getHeight());
                     drawPanel.setArmoredVehicle(armoredVehicle);
                     drawPanel.repaint();
+                }
+                else {
+                    buffer = null;
+                    drawPanel.setArmoredVehicle(armoredVehicle);
                 }
                 mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
@@ -95,10 +100,10 @@ public class FormAAGConfig{
             public void mouseReleased(MouseEvent e) {
                 if(drawPanel.getArmoredVehicle()!=null){
                     if(checkLocation(e,mainColorLabel)){
-                        armoredVehicle.setMainColor(color);
+                        drawPanel.getArmoredVehicle().setMainColor(color);
                     }
                     else if(checkLocation(e,dopColorLabel)){
-                        AntiAircraftGun AAG = (AntiAircraftGun) armoredVehicle;
+                        AntiAircraftGun AAG = (AntiAircraftGun) drawPanel.getArmoredVehicle();
                         AAG.setDopColor(color);
                     }
                     drawPanel.repaint();
@@ -225,4 +230,5 @@ public class FormAAGConfig{
         buttonGroup.add(radioButtonSix);
         radioButtonTwo.setSelected(true);
     }
+
 }
