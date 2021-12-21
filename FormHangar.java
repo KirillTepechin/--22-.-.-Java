@@ -1,3 +1,5 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -5,6 +7,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyException;
 import java.util.Stack;
 
 public class FormHangar {
@@ -26,8 +31,10 @@ public class FormHangar {
     private final HangarCollection hangarCollection;
     private final DefaultListModel<String> hangarList;
     private final Stack<Transport> taken;
+    private Logger logger;
 
     public FormHangar() {
+        logger=LogManager.getRootLogger();
         taken = new Stack<>();
         hangarList = new DefaultListModel<>();
         listBoxHangars.setModel(hangarList);
@@ -38,7 +45,7 @@ public class FormHangar {
             public void actionPerformed(ActionEvent e) {
                 JFrame frame = new JFrame();
                 frame.setSize(1000, 500);
-                FormAAGConfig formAAGConfig=new FormAAGConfig(FormHangar.this);
+                FormAAGConfig formAAGConfig = new FormAAGConfig(FormHangar.this);
                 frame.add(formAAGConfig.getMainPanel());
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -49,8 +56,19 @@ public class FormHangar {
             public void actionPerformed(ActionEvent e) {
                 String index = formattedTextField.getText();
                 if (!index.equals("")) {
-                    Hangar hangar = hangarCollection.getValue((String) listBoxHangars.getModel().getElementAt(listBoxHangars.getSelectedIndex()));
-                    var armoredVehicle = hangar.delete(hangar, Integer.parseInt(index));
+                    Hangar hangar = hangarCollection.getValue(listBoxHangars.getModel().getElementAt(listBoxHangars.getSelectedIndex()));
+                    Transport armoredVehicle = null;
+
+                    try {
+                        armoredVehicle = hangar.delete(hangar, Integer.parseInt(index));
+                        logger.info("Изъят траснпорт "+ armoredVehicle +" с места "+ formattedTextField.getText());
+                    } catch (HangarNotFoundException hangarNotFoundException) {
+                        logger.warn(hangarNotFoundException.getMessage());
+                        JOptionPane.showMessageDialog(drawPanel, hangarNotFoundException.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                    catch (Exception exception){
+                        logger.fatal("Неизвестная ошибка уровня fatal!!! - "  + exception.getMessage());
+                    }
                     if (armoredVehicle != null) {
                         taken.add(armoredVehicle);
                     }
@@ -61,6 +79,7 @@ public class FormHangar {
         buttonTakeFromCollection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 if (!taken.empty()) {
                     JFrame frame = new JFrame();
                     frame.setSize(900, 600);
@@ -71,6 +90,7 @@ public class FormHangar {
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
                     drawPanel.repaint();
+                    logger.info("Из коллекции изьят транспорт");
                 } else {
                     JOptionPane.showMessageDialog(null, "Стек пуст!");
                 }
@@ -80,7 +100,8 @@ public class FormHangar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (listBoxHangars.getSelectedIndex() > -1) {
-                    hangarCollection.DelParking((String) listBoxHangars.getModel().getElementAt(listBoxHangars.getSelectedIndex()));
+                    logger.info("Удалили ангар "+ listBoxHangars.getModel().getElementAt(listBoxHangars.getSelectedIndex()));
+                    hangarCollection.delHangar((String) listBoxHangars.getModel().getElementAt(listBoxHangars.getSelectedIndex()));
                     reloadLevels();
                     drawPanel.repaint();
                 }
@@ -97,6 +118,7 @@ public class FormHangar {
                 hangarCollection.addHangar(name);
                 reloadLevels();
                 drawPanel.repaint();
+                logger.info("Добавили ангар "+textFieldName.getText());
             }
         });
         listBoxHangars.addListSelectionListener(new ListSelectionListener() {
@@ -104,6 +126,7 @@ public class FormHangar {
             public void valueChanged(ListSelectionEvent e) {
                 drawPanel.setSelectedItem(listBoxHangars.getSelectedValue());
                 drawPanel.repaint();
+
             }
         });
         buttonSave.addActionListener(new ActionListener() {
@@ -113,10 +136,15 @@ public class FormHangar {
                 fileSaveDialog.setFileFilter(new FileNameExtensionFilter("Текстовый файл", "txt"));
                 int result = fileSaveDialog.showSaveDialog(drawPanel);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    if (hangarCollection.saveData(fileSaveDialog.getSelectedFile().getAbsolutePath() + ".txt")) {
+                    try {
+                        hangarCollection.saveData(fileSaveDialog.getSelectedFile().getAbsolutePath() + ".txt");
                         JOptionPane.showMessageDialog(drawPanel, "Файл успешно сохранен", "Результат", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
+                        logger.info("Сохранили в "+ fileSaveDialog.getSelectedFile().getAbsolutePath()+" .txt");
+                    } catch (IOException IOException) {
                         JOptionPane.showMessageDialog(drawPanel, "Файл не сохранен", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                    catch (Exception exception){
+                        logger.fatal("Неизвестная ошибка уровня fatal!!! - "  + exception.getMessage());
                     }
                 }
             }
@@ -128,12 +156,21 @@ public class FormHangar {
                 fileOpenDialog.setFileFilter(new FileNameExtensionFilter("Текстовый файл", "txt"));
                 int result = fileOpenDialog.showOpenDialog(drawPanel);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    if (hangarCollection.loadData(fileOpenDialog.getSelectedFile().getAbsolutePath())) {
+                    try {
+                        hangarCollection.loadData(fileOpenDialog.getSelectedFile().getAbsolutePath());
                         JOptionPane.showMessageDialog(drawPanel, "Файл успешно загружен", "Success", JOptionPane.INFORMATION_MESSAGE);
                         reloadLevels();
                         drawPanel.repaint();
-                    } else {
+                        logger.info("Загрузили файл из "+ fileOpenDialog.getSelectedFile().getAbsolutePath());
+                    } catch (FileNotFoundException fileNotFoundException) {
                         JOptionPane.showMessageDialog(drawPanel, "Файл не загружен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Файл не найден");
+                    } catch (HangarOverflowException hangarOverflowException) {
+                        JOptionPane.showMessageDialog(drawPanel, "Файл не загружен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Ангар переполнен");
+                    }
+                    catch (Exception exception){
+                        logger.fatal("Неизвестная ошибка уровня fatal!!! - "  + exception.getMessage());
                     }
                 }
             }
@@ -149,10 +186,19 @@ public class FormHangar {
                 }
                 int result = fileSaveDialog.showSaveDialog(drawPanel);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    if (hangarCollection.saveHangar(fileSaveDialog.getSelectedFile().getAbsolutePath() + ".txt", listBoxHangars.getSelectedValue())) {
+                    try {
+                        hangarCollection.saveHangar(fileSaveDialog.getSelectedFile().getAbsolutePath() + ".txt", listBoxHangars.getSelectedValue());
                         JOptionPane.showMessageDialog(drawPanel, "Файл успешно сохранен", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
+                        logger.info("Сохранили отдельный ангар в "+ fileSaveDialog.getSelectedFile().getAbsolutePath()+" .txt");
+                    } catch (KeyException keyException) {
                         JOptionPane.showMessageDialog(drawPanel, "Файл не сохранен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("В ангарах нет такого ангара");
+                    } catch (IOException ioException) {
+                        JOptionPane.showMessageDialog(drawPanel, "Файл не сохранен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Неверный ввод данных");
+                    }
+                    catch (Exception exception){
+                        logger.fatal("Неизвестная ошибка уровня fatal!!! - "  + exception.getMessage());
                     }
                 }
             }
@@ -164,12 +210,21 @@ public class FormHangar {
                 fileOpenDialog.setFileFilter(new FileNameExtensionFilter("Текстовый файл", "txt"));
                 int result = fileOpenDialog.showOpenDialog(drawPanel);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                    if (hangarCollection.loadHangar(fileOpenDialog.getSelectedFile().getAbsolutePath())) {
+                    try {
+                        hangarCollection.loadHangar(fileOpenDialog.getSelectedFile().getAbsolutePath());
                         JOptionPane.showMessageDialog(drawPanel, "Файл успешно загружен", "Success", JOptionPane.INFORMATION_MESSAGE);
                         reloadLevels();
                         drawPanel.repaint();
-                    } else {
+                        logger.info("Загрузили отдельный ангар из файла - "+ fileOpenDialog.getSelectedFile().getAbsolutePath());
+                    } catch (FileNotFoundException fileNotFoundException) {
                         JOptionPane.showMessageDialog(drawPanel, "Файл не загружен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Файл не найден");
+                    } catch (HangarOverflowException hangarOverflowException) {
+                        JOptionPane.showMessageDialog(drawPanel, "Файл не загружен", "Error", JOptionPane.ERROR_MESSAGE);
+                        logger.warn("Ангар переполнен");
+                    }
+                    catch (Exception exception){
+                        logger.fatal("Неизвестная ошибка уровня fatal!!! - "  + exception.getMessage());
                     }
                 }
             }
@@ -198,13 +253,20 @@ public class FormHangar {
         return mainPanel;
     }
 
-    public void setArmoredVehicle(Transport armoredVehicle){
+    public void setArmoredVehicle(Transport armoredVehicle) {
         Hangar hangar = hangarCollection.getValue(listBoxHangars.getSelectedValue());
-        if(hangar!=null) {
-            if (hangar.add(hangar, armoredVehicle) > -1) {
+        if (hangar != null && armoredVehicle!=null) {
+            try {
+                hangar.add(hangar, armoredVehicle);
                 drawPanel.repaint();
-            } else {
+                logger.info("Добавлен транспорт "+ armoredVehicle);
+               //throw new Exception();
+            } catch (HangarOverflowException e) {
                 JOptionPane.showMessageDialog(null, "Ангар переполнен!");
+                logger.warn("Бронетранспорт не удалось поставить");
+            }
+            catch (Exception e){
+                logger.fatal("Неизвестная ошибка уровня fatal!!! - ");
             }
         }
     }

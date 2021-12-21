@@ -24,11 +24,10 @@ public class Hangar<T extends Transport,G extends GunsInterface > {
         pictureHeight = picHeight;
     }
 
-    public int add(Hangar<T,G> h,T armoredVehicle)
-    {
+    public int add(Hangar<T,G> h,T armoredVehicle) throws HangarOverflowException {
         if (h.maxCount == h.places.size())
         {
-            return - 1;
+            throw new HangarOverflowException();
         }
         else
         {
@@ -37,11 +36,10 @@ public class Hangar<T extends Transport,G extends GunsInterface > {
         }
     }
 
-    public T delete (Hangar<T,G> h, int index)
-    {
+    public T delete (Hangar<T,G> h, int index) throws HangarNotFoundException {
         if (index>=h.places.size() || index<0)
         {
-            return null;
+            throw new HangarNotFoundException(index);
         }
         else
         {
