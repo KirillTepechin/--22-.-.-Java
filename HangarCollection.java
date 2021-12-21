@@ -57,12 +57,10 @@ public class HangarCollection {
         Files.deleteIfExists(Paths.get(filename));
 
         try(FileWriter fileWriter = new FileWriter(filename, false)) {
-
             fileWriter.write("HangarCollection\n");
             for (Map.Entry<String, Hangar<Vehicle, GunsInterface>> level : hangarStages.entrySet()) {
                 fileWriter.write("Hangar" + separator + level.getKey() + '\n');
-                Transport transport;
-                for (int i = 0; (transport = level.getValue().getValue(i)) != null; i++) {
+                for (Transport transport : level.getValue()) {
                     if (transport.getClass().getSimpleName().equals("ArmoredVehicle")) {
                         fileWriter.write("\tArmoredVehicle" + separator);
                     } else if (transport.getClass().getSimpleName().equals("AntiAircraftGun")) {
@@ -75,7 +73,7 @@ public class HangarCollection {
         return true;
     }
 
-    public boolean loadData(String filename) throws FileNotFoundException, HangarOverflowException {
+    public boolean loadData(String filename) throws FileNotFoundException, HangarOverflowException, HangarAlreadyHaveException {
 
         if (!new File(filename).exists()) {
             throw new FileNotFoundException();
@@ -115,14 +113,13 @@ public class HangarCollection {
     public boolean saveHangar(String filename, String key) throws KeyException, IOException {
 
         Files.deleteIfExists(Paths.get(filename));
+
         if (!hangarStages.containsKey(key)) {
             throw new KeyException();
         }
         try (FileWriter fileWriter = new FileWriter(filename, false)) {
-            if (hangarStages.containsKey(key))
-                fileWriter.write("Hangar" + separator + key + '\n');
-            Transport transport;
-            for (int i = 0; (transport = hangarStages.get(key).getValue(i)) != null; i++) {
+            if (hangarStages.containsKey(key)) fileWriter.write("Hangar" + separator + key + '\n');
+            for (Transport transport : hangarStages.get(key)) {
                 if (transport.getClass().getSimpleName().equals("ArmoredVehicle")) {
                     fileWriter.write("\tArmoredVehicle" + separator);
                 } else if (transport.getClass().getSimpleName().equals("AntiAircraftGun")) {
@@ -134,7 +131,7 @@ public class HangarCollection {
         return true;
     }
 
-    public boolean loadHangar(String filename) throws FileNotFoundException, HangarOverflowException {
+    public boolean loadHangar(String filename) throws FileNotFoundException, HangarOverflowException, HangarAlreadyHaveException {
         if (!new File(filename).exists()) {
             throw new FileNotFoundException("Файл " + filename + " не найден");
         }

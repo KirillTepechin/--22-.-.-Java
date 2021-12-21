@@ -28,6 +28,7 @@ public class FormHangar {
     private JButton buttonLoad;
     private JButton buttonSaveLevel;
     private JButton buttonLoadLevel;
+    private JButton buttonSort;
     private final HangarCollection hangarCollection;
     private final DefaultListModel<String> hangarList;
     private final Stack<Transport> taken;
@@ -229,6 +230,17 @@ public class FormHangar {
                 }
             }
         });
+        buttonSort.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (listBoxHangars.getSelectedIndex() > -1)
+                {
+                    hangarCollection.getValue(listBoxHangars.getSelectedValue()).sort();
+                    drawPanel.repaint();
+                    logger.info("Сортировка уровней");
+                }
+            }
+        });
     }
 
     private void reloadLevels() {
@@ -260,9 +272,15 @@ public class FormHangar {
                 hangar.add(hangar, armoredVehicle);
                 drawPanel.repaint();
                 logger.info("Добавлен транспорт "+ armoredVehicle);
+                //throw new Exception();
             } catch (HangarOverflowException e) {
                 JOptionPane.showMessageDialog(null, "Ангар переполнен!");
                 logger.warn("Бронетранспорт не удалось поставить");
+            }
+            catch (HangarAlreadyHaveException ex)
+            {
+                JOptionPane.showMessageDialog(null, "Дублирование");
+                logger.warn("Попытка добавить существующйи автомобиль");
             }
             catch (Exception e){
                 logger.fatal("Неизвестная ошибка уровня fatal!!! - ");

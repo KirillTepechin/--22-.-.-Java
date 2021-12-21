@@ -1,6 +1,7 @@
 import java.awt.*;
+import java.util.Iterator;
 
-public class ArmoredVehicle extends Vehicle {
+public class ArmoredVehicle extends Vehicle implements Comparable, Iterable<Object>{
     protected int carWeight = 90;
     protected int carHeight = 50;
     protected char separator = ';';
@@ -104,5 +105,91 @@ public class ArmoredVehicle extends Vehicle {
     public String toString() {
         return String.valueOf(maxSpeed) + separator + weight + separator + mainColor.getRGB();
     }
+    public boolean equals(ArmoredVehicle other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+        if(!getClass().getSimpleName().equals(other.getClass().getSimpleName()))
+        {
+            return false;
+        }
+        if (maxSpeed != other.maxSpeed)
+        {
+            return false;
+        }
+        if (weight != other.weight)
+        {
+            return false;
+        }
+        if (mainColor != other.mainColor)
+        {
+            return false;
+        }
+        return true;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (!(obj instanceof ArmoredVehicle)){
+            return false;
+        }
+        else
+        {
+            return equals((ArmoredVehicle) obj);
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (weight != ((ArmoredVehicle)o).weight) {
+            if (weight > ((ArmoredVehicle)o).weight) {
+                return -1;
+            }
+            else return 1;
+        }
+        else if (maxSpeed != ((ArmoredVehicle)o).maxSpeed) {
+            if (maxSpeed > ((ArmoredVehicle)o).maxSpeed) {
+                return -1;
+            }
+            else return 1;
+        }
+        else if (mainColor.getRGB() != ((ArmoredVehicle)o).mainColor.getRGB()) {
+            if (mainColor.getRGB() > ((ArmoredVehicle)o).mainColor.getRGB()) {
+                return -1;
+            }
+            else return 1;
+        }
+        return 0;
+    }
+    @Override
+    public Iterator<Object> iterator() {
+        Iterator<Object> it = new Iterator<Object>() {
+
+            private int current = -1;
+            private int allProperties=2;
+
+            @Override
+            public boolean hasNext() {
+                current++;
+                return current<=allProperties;
+            }
+            @Override
+            public String next() {
+                if(current==0){
+                    return Integer.toString(maxSpeed);
+                }
+                else if(current==1){
+                    return Float.toString(weight);
+                }
+                return Integer.toString(mainColor.getRGB());
+            }
+        };
+        return it;
+    }
 }
