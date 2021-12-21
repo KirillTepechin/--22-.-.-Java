@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+
+        <!-- SMTP appender -->
+        <SMTP name="Mail" subject="Logging"
+              to="kir.tep18@mail.ru" from= "kirill.tepechin@yandex.ru"
+              smtpHost="smtp.yandex.ru" smtpPort="465" bufferSize="100"
+              smtpProtocol="smtps"  smtpUsername="kirill.tepechin@yandex.ru"
+              smtpPassword="89093612873"
+
+        >
+            <PatternLayout>
+                <Pattern>%msg||%d{yyy-MM-dd}||%-5level %n</Pattern>
+            </PatternLayout>
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="ACCEPT"  onMismatch="DENY"/>
+            </Filters>
+        </SMTP>
+
+        <!-- File appender -->
+
+        <File name="File" fileName="D:/Logs/app.log" immediateFlush="true">
+            <PatternLayout pattern="%msg||%d{yyy-MM-dd}||%-5level %n"/>
+            <Filters>
+                <ThresholdFilter level="error"  onMatch="DENY"   onMismatch="NEUTRAL"/>
+            </Filters>
+        </File>
+
+    </Appenders>
+
+    <loggers>
+        <Root level="all">
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="Mail" level="fatal"/>
+        </Root>
+    </loggers>
+</Configuration>

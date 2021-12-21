@@ -1,14 +1,12 @@
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyException;
 import java.util.*;
 
 public class HangarCollection {
-    final Map<String, Hangar<Vehicle,GunsInterface>> hangarStages;
+    final Map<String, Hangar<Vehicle, GunsInterface>> hangarStages;
 
     public List<String> Keys;
 
@@ -17,50 +15,49 @@ public class HangarCollection {
     private final int pictureHeight;
 
     private char separator = ':';
-    public HangarCollection(int pictureWidth, int pictureHeight)
-    {
+
+    public HangarCollection(int pictureWidth, int pictureHeight) {
         hangarStages = new HashMap<>();
-        Keys=new LinkedList<>(hangarStages.keySet());
+        Keys = new LinkedList<>(hangarStages.keySet());
         this.pictureWidth = pictureWidth;
         this.pictureHeight = pictureHeight;
     }
 
-    public void addHangar(String name)
-    {
-        if (!hangarStages.containsKey(name))
-        {
+    public void addHangar(String name) {
+        if (!hangarStages.containsKey(name)) {
             hangarStages.put(name, new Hangar<>(pictureWidth, pictureHeight));
         }
     }
-    public void updateKeys(){
+
+    public void updateKeys() {
         Keys = new LinkedList<>(hangarStages.keySet());
     }
-    public void DelParking(String name)
-    {
+
+    public void delHangar(String name) {
         hangarStages.remove(name);
     }
 
-    public Hangar<Vehicle, GunsInterface> getValue(String ind){
-        if(hangarStages.containsKey(ind)){
+    public Hangar<Vehicle, GunsInterface> getValue(String ind) {
+        if (hangarStages.containsKey(ind)) {
             return hangarStages.get(ind);
         }
         return null;
     }
 
-    public Transport getParkingValue(String ind, int intInd){
+    public Transport getParkingValue(String ind, int intInd) {
         Hangar p = hangarStages.get(ind);
-        if(p != null){
+        if (p != null) {
             return p.getValue(intInd);
         }
         return null;
     }
-    public boolean saveData(String filename) {
-        try {
-            Files.deleteIfExists(Paths.get(filename));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (FileWriter fileWriter = new FileWriter(filename, false)) {
+
+    public boolean saveData(String filename) throws IOException {
+
+        Files.deleteIfExists(Paths.get(filename));
+
+        try(FileWriter fileWriter = new FileWriter(filename, false)) {
+
             fileWriter.write("HangarCollection\n");
             for (Map.Entry<String, Hangar<Vehicle, GunsInterface>> level : hangarStages.entrySet()) {
                 fileWriter.write("Hangar" + separator + level.getKey() + '\n');
@@ -74,60 +71,52 @@ public class HangarCollection {
                     fileWriter.write(transport.toString() + '\n');
                 }
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return true;
     }
-    public boolean loadData(String filename) {
+
+    public boolean loadData(String filename) throws FileNotFoundException, HangarOverflowException {
 
         if (!new File(filename).exists()) {
-            return false;
+            throw new FileNotFoundException();
         }
 
-        try (FileReader fileReader = new FileReader(filename)) {
-            Scanner sc = new Scanner(fileReader);
-            if (sc.nextLine().contains("HangarCollection")) {
-                hangarStages.clear();
-            } else {
-                return false;
-            }
+        FileReader fileReader = new FileReader(filename);
+        Scanner sc = new Scanner(fileReader);
+        if (sc.nextLine().contains("HangarCollection")) {
+            hangarStages.clear();
+        } else {
+            throw new IllegalArgumentException("Неверный формат файла");
+        }
 
-            Vehicle transport = null;
-            String key = "";
-            String line;
+        Vehicle transport = null;
+        String key = "";
+        String line;
 
-            while (sc.hasNextLine()) {
-                line = sc.nextLine();
-                if (line.contains("Hangar")) {
-                    key = line.split(String.valueOf(separator))[1];
-                    hangarStages.put(key, new Hangar<Vehicle, GunsInterface>(pictureWidth, pictureHeight));
+        while (sc.hasNextLine()) {
+            line = sc.nextLine();
+            if (line.contains("Hangar")) {
+                key = line.split(String.valueOf(separator))[1];
+                hangarStages.put(key, new Hangar<Vehicle, GunsInterface>(pictureWidth, pictureHeight));
+            } else if (line.contains(String.valueOf(separator))) {
+                if (line.contains("\tArmoredVehicle")) {
+                    transport = new ArmoredVehicle(line.split(String.valueOf(separator))[1]);
+                } else if (line.contains("\tAntiAircraftGun")) {
+                    transport = new AntiAircraftGun(line.split(String.valueOf(separator))[1]);
                 }
-                else if (line.contains(String.valueOf(separator))) {
-                    if (line.contains("\tArmoredVehicle")) {
-                        transport = new ArmoredVehicle(line.split(String.valueOf(separator))[1]);
-                    } else if (line.contains("\tAntiAircraftGun")) {
-                        transport = new AntiAircraftGun(line.split(String.valueOf(separator))[1]);
-                    }
-                    if (hangarStages.get(key).add(hangarStages.get(key), transport) <= -1) {
-                        return false;
-                    }
+                if (hangarStages.get(key).add(hangarStages.get(key), transport) <= -1) {
+                    throw new HangarOverflowException();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return true;
     }
-    public boolean saveHangar(String filename, String key) {
-        try {
-            Files.deleteIfExists(Paths.get(filename));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    public boolean saveHangar(String filename, String key) throws KeyException, IOException {
+
+        Files.deleteIfExists(Paths.get(filename));
         if (!hangarStages.containsKey(key)) {
-            return false;
+            throw new KeyException();
         }
         try (FileWriter fileWriter = new FileWriter(filename, false)) {
             if (hangarStages.containsKey(key))
@@ -141,48 +130,43 @@ public class HangarCollection {
                 }
                 fileWriter.write(transport.toString() + '\n');
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-    public boolean loadHangar(String filename) {
-        if (!new File(filename).exists()) {
-            return false;
-        }
-        try (FileReader fileReader = new FileReader(filename)) {
-            Scanner scanner = new Scanner(fileReader);
-            String key;
-            String line;
-            line = scanner.nextLine();
-            if (line.contains("Hangar:")) {
-                key = line.split(String.valueOf(separator))[1];
-                if (hangarStages.containsKey(key)) {
-                    hangarStages.get(key).clearHangar();
-                } else {
-                    hangarStages.put(key, new Hangar<Vehicle, GunsInterface>(pictureWidth, pictureHeight));
-                }
-            } else {
-                return false;
-            }
-            Vehicle transport = null;
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
-                if (line.contains(String.valueOf(separator))) {
-                    if (line.contains("\tArmoredVehicle")) {
-                        transport = new ArmoredVehicle(line.split(String.valueOf(separator))[1]);
-                    } else if (line.contains("\tAntiAircraftGun")) {
-                        transport = new AntiAircraftGun(line.split(String.valueOf(separator))[1]);
-                    }
-                    if (hangarStages.get(key).add(hangarStages.get(key), transport) <= -1) {
-                        return false;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return true;
     }
 
+    public boolean loadHangar(String filename) throws FileNotFoundException, HangarOverflowException {
+        if (!new File(filename).exists()) {
+            throw new FileNotFoundException("Файл " + filename + " не найден");
+        }
+        FileReader fileReader = new FileReader(filename);
+        Scanner scanner = new Scanner(fileReader);
+        String key;
+        String line;
+        line = scanner.nextLine();
+        if (line.contains("Hangar:")) {
+            key = line.split(String.valueOf(separator))[1];
+            if (hangarStages.containsKey(key)) {
+                hangarStages.get(key).clearHangar();
+            } else {
+                hangarStages.put(key, new Hangar<Vehicle, GunsInterface>(pictureWidth, pictureHeight));
+            }
+        } else {
+            throw new IllegalArgumentException("Неверный формат файла");
+        }
+        Vehicle transport = null;
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
+            if (line.contains(String.valueOf(separator))) {
+                if (line.contains("\tArmoredVehicle")) {
+                    transport = new ArmoredVehicle(line.split(String.valueOf(separator))[1]);
+                } else if (line.contains("\tAntiAircraftGun")) {
+                    transport = new AntiAircraftGun(line.split(String.valueOf(separator))[1]);
+                }
+                if (hangarStages.get(key).add(hangarStages.get(key), transport) <= -1) {
+                    throw new HangarOverflowException();
+                }
+            }
+        }
+        return true;
+    }
 }
