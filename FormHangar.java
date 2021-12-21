@@ -260,7 +260,6 @@ public class FormHangar {
                 hangar.add(hangar, armoredVehicle);
                 drawPanel.repaint();
                 logger.info("Добавлен транспорт "+ armoredVehicle);
-               //throw new Exception();
             } catch (HangarOverflowException e) {
                 JOptionPane.showMessageDialog(null, "Ангар переполнен!");
                 logger.warn("Бронетранспорт не удалось поставить");
