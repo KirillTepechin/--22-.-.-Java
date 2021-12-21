@@ -1,7 +1,9 @@
 import java.awt.*;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-public class Hangar<T extends Transport,G extends GunsInterface > {
+import java.util.function.Consumer;
+
+public class Hangar<T extends Transport,G extends GunsInterface > implements Iterable<Vehicle> {
     private final List<T> places;
 
     private final int maxCount;
@@ -24,10 +26,14 @@ public class Hangar<T extends Transport,G extends GunsInterface > {
         pictureHeight = picHeight;
     }
 
-    public int add(Hangar<T,G> h,T armoredVehicle) throws HangarOverflowException {
+    public int add(Hangar<T,G> h,T armoredVehicle) throws HangarOverflowException, HangarAlreadyHaveException {
         if (h.maxCount == h.places.size())
         {
             throw new HangarOverflowException();
+        }
+        if (h.places.contains(armoredVehicle))
+        {
+            throw new HangarAlreadyHaveException();
         }
         else
         {
@@ -102,5 +108,35 @@ public class Hangar<T extends Transport,G extends GunsInterface > {
     }
     public void clearHangar(){
         places.clear();
+    }
+
+
+    public void sort() {
+        places.sort((Comparator<? super T>) new ArmoredVehicleComparer());
+    }
+
+
+    @Override
+    public Iterator<Vehicle> iterator() {
+        Iterator<Vehicle> it = new Iterator<Vehicle>() {
+
+            private int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < places.size() && places.get(currentIndex) != null;
+            }
+
+            @Override
+            public Vehicle next() {
+                return (Vehicle) places.get(currentIndex++);
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+        return it;
     }
 }
